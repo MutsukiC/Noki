@@ -28,15 +28,15 @@ class BaseHook: XposedModule() {
         )
         val notifyTagAbortMethod = nfcServiceClass.getDeclaredMethod("notifyTagAbort")
 
-        val isExitReaderMode = ThreadLocal<Boolean>()
+        val isInSetReaderMode = ThreadLocal<Boolean>()
         hook(setReaderModeMethod).intercept { chain ->
-            isExitReaderMode.set(true)
+            isInSetReaderMode.set(true)
             chain.proceed()
-            isExitReaderMode.set(false)
+            isInSetReaderMode.set(false)
         }
 
         hook(maybeDisconnectTargetMethod).intercept { chain ->
-            if (isExitReaderMode.get() == true) {
+            if (isInSetReaderMode.get() == true) {
                 log(Log.INFO, TAG, "Skipped maybeDisconnectTarget")
             } else { chain.proceed() }
         }
