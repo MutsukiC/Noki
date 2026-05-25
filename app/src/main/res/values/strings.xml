@@ -1,3 +1,3 @@
 <resources>
-    <string name="app_desc">Fix NFC SecurityKey reading on some Xiaomi Devices</string>
+    <string name="app_desc">Fix FIDO over NFC on some Xiaomi device</string>
 </resources>
