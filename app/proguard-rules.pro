@@ -19,5 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-adaptresourcefilecontents META-INF/xposed/java_init.list
 
--keep class moe.lar.noki.BaseHook {*;}
+-keep,allowobfuscation,allowoptimization public class * extends io.github.libxposed.api.XposedModule {
+    public <init>(...);
+}
+
+-repackageclasses
+-allowaccessmodification

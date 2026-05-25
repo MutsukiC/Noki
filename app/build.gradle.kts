@@ -6,12 +6,11 @@ import org.gradle.process.ExecOperations
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.lsplugin.apktransform)
 }
 
-val VersionCode by extra(getAppVersionCode())
-val VersionName by extra(getAppVersionName())
+val versionCodeFromGit by extra(getAppVersionCode())
+val versionNameFromGit by extra(getAppVersionName())
 
 abstract class GitHelper @Inject constructor(
     private val execOps: ExecOperations
@@ -56,8 +55,8 @@ val keystoreProperties = if (keystorePropertiesFile.exists() && keystoreProperti
 apktransform {
     copy {
         when (it.buildType) {
-            "release" -> file("${it.name}/noki.${VersionName}.apk")
-            "debug" -> file("${it.name}/noki.${VersionName}-debug.apk")
+            "release" -> file("${it.name}/noki.${versionNameFromGit}.apk")
+            "debug" -> file("${it.name}/noki.${versionNameFromGit}-debug.apk")
             else -> null
         }
     }
@@ -65,14 +64,14 @@ apktransform {
 
 android {
     namespace = "moe.lar.noki"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "moe.lar.noki"
+        applicationId = "moe.kmi.noki"
         minSdk = 30
-        targetSdk = 35
-        versionCode = VersionCode
-        versionName = VersionName
+        targetSdk = 36
+        versionCode = versionCodeFromGit
+        versionName = versionNameFromGit
 
     }
     signingConfigs {
@@ -90,8 +89,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             val releaseSig = signingConfigs.findByName("release")
@@ -101,15 +100,20 @@ android {
             }
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+
+    packaging {
+        resources {
+            merges += "META-INF/xposed/*"
+            excludes += "**"
+        }
     }
 }
 
 dependencies {
-    compileOnly("de.robv.android.xposed:api:82")
+    compileOnly(libs.libxposed.api)
 }
